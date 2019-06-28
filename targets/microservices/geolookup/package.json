@@ -1,0 +1,28 @@
+{
+  "name": "geolookup",
+  "version": "1.0.0",
+  "description": "A simple API to lookup GPS coordinates based on city name",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paulsbruce/neoload-as-code.git"
+  },
+  "keywords": [
+    "microservice"
+  ],
+  "author": "Paul Bruce <me@paulsbruce.io>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/paulsbruce/neoload-as-code/issues"
+  },
+  "homepage": "https://github.com/paulsbruce/neoload-as-code#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "redis": "^2.8.0",
+    "request": "^2.88.0"
+  }
+}
