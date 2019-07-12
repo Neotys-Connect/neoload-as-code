@@ -1,0 +1,46 @@
+user_paths:
+- name: ex_1_1_complete_request_get
+  actions:
+    steps:
+
+    - transaction:
+        name: External Geo-lookup (may cache)
+        description: Call Open Street Maps to translate city names to lat/lon
+        steps:
+        - request:
+            url: /search?format=json&q=${cities.City}
+            server: geolookup_host
+            sla_profile: geo_3rdparty_sla
+
+#    - transaction:
+#        name: testing
+#        steps:
+#        - request:
+#            url: /${NL-CustomResources}
+#            server: geolookup_host
+
+    - delay: 1s
+
+- name: ex_1_1_complete_request_post
+  actions:
+    steps:
+
+    - transaction:
+        name: External via post (no cache)
+        description: Use the POST command to translate city names to lat/lon
+        steps:
+        - request:
+            method: POST
+            url: /search?cache=false
+            server: geolookup_host
+            sla_profile: geo_3rdparty_sla_nocache
+            headers:
+            - accept: application/json
+            - Content-Type: application/json
+            body: |
+              {
+                "city": "${cities.City}",
+                "query_encoded": "__encodeURL(${cities.City})"
+              }
+
+    - delay: 1s

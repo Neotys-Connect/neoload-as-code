@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  neoload-cli:
+    container_name: neoload-cli
+    build:
+      context: ./compose/Docker/neoload-cli
+      dockerfile: Dockerfile
+    environment:
+      - NLW_TOKEN=$NLW_TOKEN
+      - YAML_FILEPATH=$YAML
+      - SCENARIO=$SCN
+#    env_file:
+#      - ./compose/Docker/neoload-cli/neoload-cli.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock ## docker-in-docker control
+      - ./:/neoload-as-code ## for configuration persistence and DinD builds
+    networks:
+      - neoload-examples
+    depends_on:
+      - redis
+      - geolookup
+
+  redis:
+    container_name: neotys-examples-redis
+    image: redis
+    networks:
+      - neoload-examples
+    ports:
+      - 6379:6379
+
+  geolookup:
+    container_name: neotys-examples-geolookup
+    build:
+      context: ./
+      dockerfile: compose/Docker/geolookup/Dockerfile
+    networks:
+      - neoload-examples
+    ports:
+      - 3000:3000
+    entrypoint: node
+    command: "index.js --redis=redis:6379 --log_level=warning"
+
+networks:
+  neoload-examples:

@@ -4,6 +4,9 @@
   "description": "A simple API to lookup GPS coordinates based on city name",
   "main": "index.js",
   "scripts": {
+    "redis-init": "docker run -d --name redis -p 6379:6379 redis",
+    "redis-live": "docker run -d --name redislive -p 6379:6379 paulsbruce/redislive",
+    "redis": "node index.js --redis=6379",
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,6 +26,8 @@
   "dependencies": {
     "express": "^4.17.1",
     "redis": "^2.8.0",
-    "request": "^2.88.0"
+    "redis-delete-wildcard": "0.0.3",
+    "request": "^2.88.0",
+    "yargs": "^13.2.4"
   }
 }
