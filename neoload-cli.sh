@@ -49,14 +49,21 @@ fi
 LOGS_DIR_HOST=./.logs
 NL_OUT_LOG_FILEPATH=$LOGS_DIR_HOST/neoload-out.log
 
+build_the_cli() {
+  docker pull paulsbruce/neoload-as-code-controller
+  docker-compose --file examples.yaml --log-level ERROR build neoload-cli
+}
+
 # set positional arguments in their proper place
 #eval set -- "$PARAMS"
 if $VERIFY ; then
+  build_the_cli
   docker-compose --file examples.yaml --log-level ERROR run neoload-cli
-  docker pull paulsbruce/neoload-as-code-controller
 else
   if $INIT ; then
-    NLW_TOKEN=$TOKEN docker-compose --file $COMPOSE_YAML_FILE --log-level ERROR run neoload-cli
+    echo "Init..."
+    build_the_cli
+    NLW_TOKEN=$TOKEN docker-compose --file $COMPOSE_YAML_FILE --log-level INFO run neoload-cli
   else
     if [[ ( ! -z "$SCENARIO" && ! -z "$FILE" ) ]]; then # not empty
       FILEPATH="$( cd "${FILE%/*}" && pwd )"/"${FILE##*/}"
@@ -67,6 +74,7 @@ else
 
       #echo "FILEPATH: $FILEPATH"
       #echo "SCENARIO: $SCENARIO"
+      build_the_cli
       YAML=$FILEPATH SCN=$SCENARIO docker-compose --file $COMPOSE_YAML_FILE --log-level WARNING run neoload-cli &
       COMPID=$!
 
@@ -106,3 +114,7 @@ else
     fi
   fi
 fi
+
+docker stop $(docker ps -a --filter "name=neotys-examples" --format="{{.ID}}") > /dev/null 2>&1
+docker rm $(docker stop $(docker ps -a --filter "name=neoload-as-code" --format="{{.ID}}")) > /dev/null 2>&1
+docker rmi $(docker images -f="dangling=true" --format="{{.ID}}") > /dev/null 2>&1

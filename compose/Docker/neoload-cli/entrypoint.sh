@@ -6,14 +6,15 @@
 #docker pull paulsbruce/neoload-as-code-controller:latest
 
 CTRL_CONTAINER_NAME=neoload-cli-ctrl
+NL_CONTROLLER_DOCKER_IMAGENAME=paulsbruce/neoload-as-code-controller
 
 BASE_DIR=/neoload-as-code
-BASE_DIR_HOST=$(docker inspect --format "{{ range .Mounts }}{{ if eq .Destination \"$BASE_DIR\" }}{{ .Source }}{{ end }}{{ end }}" neoload-cli)
+BASE_DIR_HOST=$(docker inspect --format "{{ range .Mounts }}{{ if eq .Destination \"$BASE_DIR\" }}{{ .Source }}{{ end }}{{ end }}" $(docker ps -a -q --filter "name=neoload-cli" --format="{{.ID}}"))
 LOGS_DIR_HOST=$BASE_DIR_HOST/.logs
 BASE_DIR_HOST_CLI=$BASE_DIR_HOST/compose/Docker/neoload-cli
 #docker network ls
 CONF_VARS_DIR_NAME=.conf
-CONF_VARS_DIR=$BASE_DIR/.conf
+CONF_VARS_DIR=$BASE_DIR/$CONF_VARS_DIR_NAME
 CONF_VARS_FILEPATH=$CONF_VARS_DIR/docker-cli.custom.env
 
 init_conf_file() {
@@ -59,11 +60,11 @@ CTRL_PROJECT_HOME=/home/neoload/.neotys/neoload/v6.10
 if [ $NEEDS_SYSTEM_CHECK = 1 ]; then
   cp $BASE_DIR/compose/Docker/neoload-cli/nl_system_check.yaml $CONF_VARS_DIR
   echo "
-mkdir $CTRL_PROJECT_HOME
+  mkdir -p $CTRL_PROJECT_HOME
 cp /$CONF_VARS_DIR_NAME/nl_system_check.yaml $CTRL_PROJECT_HOME
-exec /home/neoload/neoload/bin/NeoLoadCmd -project $CTRL_PROJECT_HOME/nl_system_check.yaml -launch systemCheck -exit -noGUI -nlweb -nlwebToken ${NLW_TOKEN} -leaseServer nlweb -leaseLicense 10:1
+cd $CTRL_PROJECT_HOME && /home/neoload/neoload/bin/NeoLoadCmd -project $CTRL_PROJECT_HOME/nl_system_check.yaml -launch systemCheck -exit -noGUI -nlweb -nlwebToken ${NLW_TOKEN}
 " > $CONF_VARS_DIR/current-controller-entrypoint.sh
-  docker run --name neoload_ctrl --rm -v $BASE_DIR_HOST/$CONF_VARS_DIR_NAME:/$CONF_VARS_DIR_NAME --entrypoint "/bin/sh" neotys/neoload-controller /$CONF_VARS_DIR_NAME/current-controller-entrypoint.sh
+  docker run --name neoload_ctrl --rm -v $BASE_DIR_HOST/$CONF_VARS_DIR_NAME:/$CONF_VARS_DIR_NAME --entrypoint "/bin/sh" $NL_CONTROLLER_DOCKER_IMAGENAME /$CONF_VARS_DIR_NAME/current-controller-entrypoint.sh
 fi
 
 pid=0
@@ -75,10 +76,7 @@ if [ ! -z "$YAML_FILEPATH" ]; then # not empty
     SCENARIO_NAME=$SCENARIO
     HOST_IP=$(dig +short host.docker.internal | grep '^[.0-9]*$')
     echo "
-#mkdir $CTRL_PROJECT_HOME
 cp -R /src_project/** $CTRL_PROJECT_HOME
-#echo "-Duser.dir=$CTRL_PROJECT_HOME" >> /home/neoload/neoload/bin/NeoLoadCmd.vmoptions
-
 cp /home/neoload/neoload/bin/NeoLoadCmd.vmoptions /home/neoload/.neotys/neoload/v6.10/logs/NeoLoadCmd.vmoptions
 #IF USING NLW FOR LICENSE#exec /home/neoload/neoload/bin/NeoLoadCmd -project $CTRL_PROJECT_HOME/$YAML_NAME -launch $SCENARIO_NAME -exit -noGUI -nlweb -nlwebToken ${NLW_TOKEN} -leaseServer nlweb -leaseLicense 50:1
 cd $CTRL_PROJECT_HOME && /home/neoload/neoload/bin/NeoLoadCmd -project $CTRL_PROJECT_HOME/$YAML_NAME -launch $SCENARIO_NAME -exit -noGUI -nlweb -nlwebToken ${NLW_TOKEN}
@@ -95,7 +93,7 @@ cd $CTRL_PROJECT_HOME && /home/neoload/neoload/bin/NeoLoadCmd -project $CTRL_PRO
     docker ps --format '{{.Names}}' | grep "^$CTRL_CONTAINER_NAME" | awk '{print $1}' | xargs -I {} docker kill {}
     # use paulsbruce/neoload-as-code-controller which comes with a tiny demo license
     #docker run --name $CTRL_CONTAINER_NAME --rm --cpus=".75" --memory-reservation 768M -v $BASE_DIR_HOST/$CONF_VARS_DIR_NAME:/$CONF_VARS_DIR_NAME -v "$YAML_DIR":/src_project --add-host localhost:$HOST_IP --entrypoint "/bin/sh" paulsbruce/neoload-as-code-controller /$CONF_VARS_DIR_NAME/current-controller-entrypoint.sh &
-    docker run --name $CTRL_CONTAINER_NAME --rm --cpus=".75" --memory-reservation 768M -v $BASE_DIR_HOST/$CONF_VARS_DIR_NAME:/$CONF_VARS_DIR_NAME -v $LOGS_DIR_HOST:/home/neoload/.neotys/neoload/v6.10/logs -v "$YAML_DIR":/src_project --add-host localhost:$HOST_IP -e CONTROLLER_XMX=-Xmx768m --entrypoint "/bin/sh" paulsbruce/neoload-as-code-controller /$CONF_VARS_DIR_NAME/current-controller-entrypoint.sh &
+    docker run --name $CTRL_CONTAINER_NAME --rm --cpus=".75" --memory-reservation 768M -v $BASE_DIR_HOST/$CONF_VARS_DIR_NAME:/$CONF_VARS_DIR_NAME -v $LOGS_DIR_HOST:/home/neoload/.neotys/neoload/v6.10/logs -v "$YAML_DIR":/src_project --add-host localhost:$HOST_IP -e CONTROLLER_XMX=-Xmx768m --entrypoint "/bin/sh" $NL_CONTROLLER_DOCKER_IMAGENAME /$CONF_VARS_DIR_NAME/current-controller-entrypoint.sh &
     pid="$!"
     # wait forever
     while true
