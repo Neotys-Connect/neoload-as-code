@@ -1,0 +1,64 @@
+name: NeoLoad-as-code-examples-1_1
+includes:
+- complete_request.yaml
+
+variables:
+- file:
+    name: cities
+    column_names: ["City"]
+    is_first_line_column_names: false
+    start_from_line: 1
+    delimiter: ","
+    path: data/cities.csv
+    change_policy: each_iteration
+    scope: global
+    order: any
+    out_of_value: cycle
+
+servers:
+- name: geolookup_host
+  host: host.docker.internal
+  port: 3000
+
+sla_profiles:
+- name: geo_3rdparty_sla
+  description: Avg Resp Time >=100ms >= 250ms for cached queries
+  thresholds:
+  - avg-resp-time warn >= 100ms fail >= 250ms per interval
+  - error-rate warn >= 2% fail >= 5% per test
+- name: geo_3rdparty_sla_nocache
+  description: Avg Resp Time >=250ms >= 500ms for non-cached queries
+  thresholds:
+  - avg-resp-time warn >= 250ms fail >= 500ms per interval
+  - error-rate warn >= 5% fail >= 10% per test
+
+populations:
+- name: popGets
+  user_paths:
+  - name: ex_1_1_complete_request_get
+- name: popGetsAndPosts
+  user_paths:
+  - name: ex_1_1_complete_request_get
+    distribution: 90%
+  - name: ex_1_1_complete_request_post
+    distribution: 10%
+
+scenarios:
+- name: sanityScenario
+  populations:
+  - name: popGetsAndPosts
+    rampup_load:
+      min_users: 1
+      max_users: 5
+      increment_users: 1
+      increment_every: 5s
+      duration: 30s
+- name: fullTest
+  populations:
+  - name: popGetsAndPosts
+    rampup_load:
+      min_users: 1
+      max_users: 25
+      increment_users: 2
+      increment_every: 5s
+      duration: 5m

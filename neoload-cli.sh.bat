@@ -19,6 +19,7 @@ endlocal
 # for dev purposes
 #docker-compose --file examples.yaml build --force-rm neotys-examples-cli-params
 #docker-compose --file examples.yaml build --force-rm neoload-cli
+#docker-compose --file examples.yaml build --force-rm --no-cache geolookup && docker-compose --file examples.yaml run geolookup
 
 NL_CLI_PARAMS=$@ docker-compose --file examples.yaml --log-level ERROR run neotys-examples-cli-params &
 COMPID=$!

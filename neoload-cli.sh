@@ -20,7 +20,7 @@ rm -rf $LOGS_DIR_HOST/*
 #docker-compose --file examples.yaml build --force-rm neotys-examples-cli-params
 #docker-compose --file examples.yaml build --force-rm neoload-cli
 
-NL_CLI_PARAMS=$@ docker-compose --file examples.yaml --log-level ERROR run neotys-examples-cli-params &
+@start /b cmd /c NL_CLI_PARAMS=$* docker-compose --file examples.yaml --log-level ERROR run neotys-examples-cli-params
 COMPID=$!
 
 sleep 10
