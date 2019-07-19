@@ -5,6 +5,7 @@ ENV NPM_SCRIPT start
 WORKDIR /geolookup
 
 COPY ./targets/microservices/geolookup/package*.json ./
+#RUN npm install --verbose
 RUN npm install
 
 COPY ./targets/microservices/geolookup/. .

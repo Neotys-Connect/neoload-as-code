@@ -1,6 +1,6 @@
-name: NeoLoad-as-code-examples-1_1
+name: NeoLoad-as-code-examples-1_2
 includes:
-- complete_request.yaml
+- oauth_workflow.yaml
 
 variables:
 - file:
@@ -16,37 +16,37 @@ variables:
     out_of_value: cycle
 
 servers:
-- name: geolookup_host
+- name: app_server
   host: host.docker.internal
   port: 3000
 
 sla_profiles:
-- name: geo_3rdparty_sla
-  description: Avg Resp Time >=100ms >= 250ms for cached queries
+- name: sla_internal_api_calls
   thresholds:
-  - avg-resp-time warn >= 100ms fail >= 250ms per interval
-  - error-rate warn >= 2% fail >= 5% per test
-- name: geo_3rdparty_sla_nocache
-  description: Avg Resp Time >=250ms >= 500ms for non-cached queries
+  - avg-request-resp-time warn >= 500ms fail >= 1s per test
+  - perc-transaction-resp-time (p95) warn >= 300ms fail >= 1200ms per test
+  - error-rate warn >= 5% per interval
+- name: sla_external_api_calls
   thresholds:
-  - avg-resp-time warn >= 250ms fail >= 500ms per interval
-  - error-rate warn >= 5% fail >= 10% per test
+  - avg-request-resp-time warn >= 500ms fail >= 1s per test
+  - perc-transaction-resp-time (p95) warn >= 10s fail >= 20s per test
+  - error-rate warn >= 5% per interval
+- name: sla_static_resources
+  thresholds:
+  - avg-resp-time warn >= 500ms fail >= 1000ms per interval
+- name: sla_internal_api_calls_big_response
+  thresholds:
+  - perc-transaction-resp-time (p95) warn >= 30s fail >= 60s per test
 
 populations:
-- name: popGets
+- name: popOAuth
   user_paths:
-  - name: ex_1_1_complete_request_get
-- name: popGetsAndPosts
-  user_paths:
-  - name: ex_1_1_complete_request_get
-    distribution: 90%
-  - name: ex_1_1_complete_request_post
-    distribution: 10%
+  - name: oauth_workflow
 
 scenarios:
 - name: sanityScenario
   populations:
-  - name: popGetsAndPosts
+  - name: popOAuth
     rampup_load:
       min_users: 1
       max_users: 5
@@ -55,7 +55,7 @@ scenarios:
       duration: 30s
 - name: fullTest
   populations:
-  - name: popGetsAndPosts
+  - name: popOAuth
     rampup_load:
       min_users: 1
       max_users: 25

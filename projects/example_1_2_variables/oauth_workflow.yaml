@@ -26,7 +26,7 @@ user_paths:
             extractors:
             - name: oauth_bearer
               jsonpath: $.access_token
-              regexp: (.*)
+              #regexp: (.*)
               match_number: 1
               extract_once: true
   actions:
@@ -66,5 +66,5 @@ user_paths:
             - Authorization: Bearer ${oauth_bearer}
         - request:
             url: /search?format=json&q=${cities.City}
-            server: external_maps
+            server: app_server
             method: GET

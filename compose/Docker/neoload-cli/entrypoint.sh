@@ -83,6 +83,7 @@ cp /home/neoload/neoload/bin/NeoLoadCmd.vmoptions /home/neoload/.neotys/neoload/
 #IF USING NLW FOR LICENSE#exec /home/neoload/neoload/bin/NeoLoadCmd -project $CTRL_PROJECT_HOME/$YAML_NAME -launch $SCENARIO_NAME -exit -noGUI -nlweb -nlwebToken ${NLW_TOKEN} -leaseServer nlweb -leaseLicense 50:1
 cd $CTRL_PROJECT_HOME && /home/neoload/neoload/bin/NeoLoadCmd -project $CTRL_PROJECT_HOME/$YAML_NAME -launch $SCENARIO_NAME -exit -noGUI -nlweb -nlwebToken ${NLW_TOKEN}
 " > $CONF_VARS_DIR/current-controller-entrypoint.sh
+    sleep 2 # for above file to be written out
 
     # setup handlers
     # on callback, kill the last background process, which is `tail -f /dev/null` and execute the specified handler
