@@ -1,0 +1,4 @@
+* text=auto
+*.sh binary
+*.env binary
+Dockerfile binary
