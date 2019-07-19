@@ -1,6 +1,22 @@
 version: '3'
 
 services:
+  neotys-examples-cli-params:
+    container_name: neotys-examples-cli-params
+    build:
+      context: ./compose/Docker/neoload-cli
+      dockerfile: Dockerfile
+    environment:
+      - NL_CLI_PARAMS=$NL_CLI_PARAMS
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock ## docker-in-docker control
+      - ./:/neoload-as-code ## for configuration persistence and DinD builds
+    networks:
+      - neoload-examples
+    entrypoint: /bin/sh
+    command: -c "/neoload-cli/entrypoint-params.sh $NL_CLI_PARAMS"
+
+
   neoload-cli:
     container_name: neoload-cli
     build:
@@ -14,12 +30,14 @@ services:
 #      - ./compose/Docker/neoload-cli/neoload-cli.env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock ## docker-in-docker control
-      - ./:/neoload-as-code ## for configuration persistence and DinD builds
+      - $BASE_DIR_HOST:/neoload-as-code
     networks:
       - neoload-examples
     depends_on:
       - redis
       - geolookup
+    #entrypoint: /bin/sh
+    #command: -c "whoami && pwd && ls -latr /neoload-as-code && ls -latr /neoload-cli"
 
   redis:
     container_name: neotys-examples-redis

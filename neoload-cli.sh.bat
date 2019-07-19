@@ -1,20 +1,20 @@
-#!/bin/bash
 
-#examples:
-# chmod u+x neoload-cli.sh
-# ./neoload-cli.sh --verify
-# ./neoload-cli.sh --init [token]
-# ./neoload-cli.sh --scenario=sanityScenario --file=projects/example_1_1_request/project.yaml
 
-LOGS_DIR_HOST=./.logs
-NL_OUT_LOG_FILEPATH=$LOGS_DIR_HOST/neoload-out.log
+REM examples:
+REM neoload-cli.sh --verify
+REM neoload-cli.sh --init [token]
+REM neoload-cli.sh --scenario=sanityScenario --file=projects/example_1_1_request/project.yaml
+
+
+SET LOGS_DIR_HOST=.\.logs
+SET NL_OUT_LOG_FILEPATH=$LOGS_DIR_HOST\neoload-out.log
 
 # if doesn't already exist, create it for volume attach
+@echo off
+setlocal enableextensions enabledelayedexpansion
 mkdir -p $LOGS_DIR_HOST
 rm -rf $LOGS_DIR_HOST/*
-
-
-
+endlocal
 
 # for dev purposes
 #docker-compose --file examples.yaml build --force-rm neotys-examples-cli-params
