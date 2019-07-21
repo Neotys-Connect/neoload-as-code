@@ -10,10 +10,11 @@ services:
       - NL_CLI_PARAMS=$NL_CLI_PARAMS
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock ## docker-in-docker control
-      - ./:/neoload-as-code ## for configuration persistence and DinD builds
+      - $BASE_DIR_HOST:/neoload-as-code ## for configuration persistence and DinD builds
     networks:
       - neoload-examples
     entrypoint: /bin/sh
+    #command: -c "ls -latr /neoload-as-code"
     command: -c "/neoload-cli/entrypoint-params.sh $NL_CLI_PARAMS"
 
 

@@ -45,7 +45,7 @@ NL_OUT_LOG_FILEPATH=$LOGS_DIR_HOST/neoload-out.log
 
 BASE_DIR=/neoload-as-code
 BASE_DIR_HOST=$(docker inspect --format "{{ range .Mounts }}{{ if eq .Destination \"$BASE_DIR\" }}{{ .Source }}{{ end }}{{ end }}" $(docker ps -a -q --filter "name=neotys-examples-cli-params" --filter "status=running" --format="{{.ID}}"))
-
+echo "BASE_DIR_HOST: $BASE_DIR_HOST"
 CLI_BUILT=false
 build_the_cli() {
   if ! $CLI_BUILT; then
