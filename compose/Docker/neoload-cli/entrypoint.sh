@@ -81,6 +81,9 @@ if [ ! -z "$YAML_FILEPATH" ]; then # not empty
     YAML_NAME=$(basename "$YAML_FILEPATH")
     SCENARIO_NAME=$SCENARIO
     HOST_IP=$(dig +short host.docker.internal | grep '^[.0-9]*$')
+    if [ -z "$HOST_IP" ]; then
+      HOST_IP=$(ip route show | awk '/default/ {print $3}')
+    fi
     echo "
 cp -R /src_project/** $CTRL_PROJECT_HOME
 cp /home/neoload/neoload/bin/NeoLoadCmd.vmoptions /home/neoload/.neotys/neoload/v6.10/logs/NeoLoadCmd.vmoptions
