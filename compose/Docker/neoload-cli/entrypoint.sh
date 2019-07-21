@@ -66,6 +66,10 @@ cp /$CONF_VARS_DIR_NAME/nl_system_check.yaml $CTRL_PROJECT_HOME
 cd $CTRL_PROJECT_HOME && /home/neoload/neoload/bin/NeoLoadCmd -project $CTRL_PROJECT_HOME/nl_system_check.yaml -launch systemCheck -exit -noGUI -nlweb -nlwebToken ${NLW_TOKEN}
 " > $CONF_VARS_DIR/current-controller-entrypoint.sh
   docker run --name neoload_ctrl --rm -v $BASE_DIR_HOST:$BASE_DIR -v $BASE_DIR_HOST/$CONF_VARS_DIR_NAME:/$CONF_VARS_DIR_NAME --entrypoint "/bin/sh" $NL_CONTROLLER_DOCKER_IMAGENAME /$CONF_VARS_DIR_NAME/current-controller-entrypoint.sh
+else
+  if [ -z "$YAML_FILEPATH" ]; then # we're in init phase
+    docker pull $NL_CONTROLLER_DOCKER_IMAGENAME
+  fi
 fi
 
 pid=0

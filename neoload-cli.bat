@@ -3,7 +3,7 @@ REM Purpose: curate the process of running NeoLoad As-Code getting started sampl
 REM Documentation: https://github.com/paulsbruce/neoload-as-code
 REM Usage (assumes Docker is running locally):
 REM Step 1 :\> neoload-cli.bat --verify
-REM Step 2 :\> neoload-cli.bat --init [token]
+REM Step 2 :\> neoload-cli.bat --init [replace_with_your_own_neoload_web_token]
 REM Step 3 :\> neoload-cli.bat --scenario=sanityScenario --file=projects/example_1_1_request/project.yaml
 
 SET BASE_DIR_HOST=%cd%
@@ -24,6 +24,7 @@ SET BASE_DIR_HOST=%BASE_DIR_HOST:users=Users%
 
 SET NL_CLI_PARAMS=%*
 @start /b cmd /c docker-compose --file examples.yaml --log-level ERROR run neotys-examples-cli-params
+
 
 powershell -noprofile -command "Start-Sleep -s 2"
 
@@ -56,8 +57,6 @@ SET URL_OPENED=false
 	  GOTO AfterCompose
 	)
   )
-
-  powershell -noprofile -command "Start-Sleep -s 1"
 
 GOTO WhileFile
 
