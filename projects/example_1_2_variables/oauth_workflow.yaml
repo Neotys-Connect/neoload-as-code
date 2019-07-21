@@ -26,9 +26,6 @@ user_paths:
             extractors:
             - name: oauth_bearer
               jsonpath: $.access_token
-              #regexp: (.*)
-              match_number: 1
-              extract_once: true
   actions:
     steps:
     - transaction:
