@@ -1,0 +1,70 @@
+user_paths:
+- name: oauth_workflow
+  init:
+    steps:
+    - transaction:
+        name: Obtain OAuth Token
+        description: Grab the OAuth client secret from the dynamic JS in our app
+        steps:
+        - request:
+            url: /js/bundle.js
+            server: app_server
+            method: GET
+            sla_profile: sla_static_resources
+            extractors:
+            - name: oauth_client_secret
+              regexp: OAUTH_CLIENT_SECRET:"(.*?)"
+        - request:
+            url: /platform/oauth/token
+            server: app_server
+            method: POST
+            sla_profile: sla_internal_api_calls
+            headers:
+            - accept: application/json
+            - Content-Type: application/json
+            body: '{"grant_type":"client_credentials","client_id":"ushahidiui","client_secret":"${oauth_client_secret}","scope":"posts media forms api tags savedsearches sets users stats layers config messages notifications contacts roles permissions csv"}'
+            extractors:
+            - name: oauth_bearer
+              jsonpath: $.access_token
+              #regexp: (.*)
+              match_number: 1
+              extract_once: true
+  actions:
+    steps:
+    - transaction:
+        name: Get static/gated resource
+        description: Request a static resource that requires the OAuth token
+        sla_profile: sla_static_resources
+        steps:
+        - request:
+            url: /js/bundle.js
+            server: app_server
+            method: GET
+            headers:
+            - Authorization: Bearer ${oauth_bearer}
+    - transaction:
+        name: Get internal/gated resource
+        description: Request dynamic resources that do not depend on 3rd parties
+        sla_profile: sla_internal_api_calls_big_response
+        steps:
+        - request:
+            url: /platform/api/v3/posts?order=desc&orderby=post_date
+            server: app_server
+            method: GET
+            headers:
+            - Authorization: Bearer ${oauth_bearer}
+    - transaction:
+        name: Get external/gated resource
+        description: Request dynamic resources depending on 3rd parties
+        sla_profile: sla_external_api_calls
+        steps:
+        - request:
+            url: /platform/api/v3/posts/geojson?form%5B%5D=2&form%5B%5D=4&order=desc&orderby=post_date&status%5B%5D=published&status%5B%5D=draft
+            server: app_server
+            method: GET
+            headers:
+            - Authorization: Bearer ${oauth_bearer}
+        - request:
+            url: /search?format=json&q=${cities.City}
+            server: app_server
+            method: GET

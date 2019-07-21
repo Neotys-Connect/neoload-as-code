@@ -11,6 +11,12 @@ user_paths:
             url: /search?format=json&q=${cities.City}
             server: geolookup_host
             sla_profile: geo_3rdparty_sla
+            extractors:
+            - name: latitude
+              jsonpath: $.latitude
+              regexp: (.*)
+              match_number: 1
+              extract_once: true
 
     - delay: 1s
 
@@ -35,5 +41,11 @@ user_paths:
                 "city": "${cities.City}",
                 "query_encoded": "__encodeURL(${cities.City})"
               }
+            extractors:
+            - name: latitude
+              jsonpath: $.latitude
+              regexp: (.*)
+              match_number: 1
+              extract_once: true
 
     - delay: 1s

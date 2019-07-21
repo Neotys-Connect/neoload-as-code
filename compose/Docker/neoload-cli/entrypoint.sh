@@ -66,6 +66,10 @@ cp /$CONF_VARS_DIR_NAME/nl_system_check.yaml $CTRL_PROJECT_HOME
 cd $CTRL_PROJECT_HOME && /home/neoload/neoload/bin/NeoLoadCmd -project $CTRL_PROJECT_HOME/nl_system_check.yaml -launch systemCheck -exit -noGUI -nlweb -nlwebToken ${NLW_TOKEN}
 " > $CONF_VARS_DIR/current-controller-entrypoint.sh
   docker run --name neoload_ctrl --rm -v $BASE_DIR_HOST:$BASE_DIR -v $BASE_DIR_HOST/$CONF_VARS_DIR_NAME:/$CONF_VARS_DIR_NAME --entrypoint "/bin/sh" $NL_CONTROLLER_DOCKER_IMAGENAME /$CONF_VARS_DIR_NAME/current-controller-entrypoint.sh
+else
+  if [ -z "$YAML_FILEPATH" ]; then # we're in init phase
+    docker pull $NL_CONTROLLER_DOCKER_IMAGENAME
+  fi
 fi
 
 pid=0
@@ -77,12 +81,18 @@ if [ ! -z "$YAML_FILEPATH" ]; then # not empty
     YAML_NAME=$(basename "$YAML_FILEPATH")
     SCENARIO_NAME=$SCENARIO
     HOST_IP=$(dig +short host.docker.internal | grep '^[.0-9]*$')
+    ADD_HOST_DOCKER_INTERNAL=
+    if [ -z "$HOST_IP" ]; then
+      HOST_IP=$(ip route show | awk '/default/ {print $3}')
+      ADD_HOST_DOCKER_INTERNAL=" --add-host host.docker.internal:$HOST_IP "
+    fi
     echo "
 cp -R /src_project/** $CTRL_PROJECT_HOME
 cp /home/neoload/neoload/bin/NeoLoadCmd.vmoptions /home/neoload/.neotys/neoload/v6.10/logs/NeoLoadCmd.vmoptions
 #IF USING NLW FOR LICENSE#exec /home/neoload/neoload/bin/NeoLoadCmd -project $CTRL_PROJECT_HOME/$YAML_NAME -launch $SCENARIO_NAME -exit -noGUI -nlweb -nlwebToken ${NLW_TOKEN} -leaseServer nlweb -leaseLicense 50:1
 cd $CTRL_PROJECT_HOME && /home/neoload/neoload/bin/NeoLoadCmd -project $CTRL_PROJECT_HOME/$YAML_NAME -launch $SCENARIO_NAME -exit -noGUI -nlweb -nlwebToken ${NLW_TOKEN}
 " > $CONF_VARS_DIR/current-controller-entrypoint.sh
+    sleep 2 # for above file to be written out
 
     # setup handlers
     # on callback, kill the last background process, which is `tail -f /dev/null` and execute the specified handler
@@ -102,6 +112,7 @@ cd $CTRL_PROJECT_HOME && /home/neoload/neoload/bin/NeoLoadCmd -project $CTRL_PRO
               -v $LOGS_DIR_HOST:/home/neoload/.neotys/neoload/v6.10/logs \
               -v "$YAML_BASE_DIR_HOST":/src_project/ \
               --add-host localhost:$HOST_IP \
+              $ADD_HOST_DOCKER_INTERNAL \
               -e CONTROLLER_XMX=-Xmx768m \
               --entrypoint "/bin/sh" $NL_CONTROLLER_DOCKER_IMAGENAME \
               /$CONF_VARS_DIR_NAME/current-controller-entrypoint.sh &

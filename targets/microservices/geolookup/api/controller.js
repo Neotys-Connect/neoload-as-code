@@ -3,6 +3,7 @@
 const request = require('request');
 const argv = require('yargs').argv
 const log = require('./log').newInstance(argv.log_level);
+const fs = require('fs');
 
 log.always('Started with the following options: ' + JSON.stringify(argv))
 
@@ -151,6 +152,19 @@ var controller = {
   listCacheKeys: (req,res) => { cache.listKeys((ret) => { res.json(ret)}); },
   deleteNonPrefixKeys: (req,res) => { cache.deleteNonPrefixKeys((ret) => { res.json(ret)}); },
   __updateReadoutTimeoutId: 0,
+
+  createOAuthToken: (req,res) => {
+    res.json({"access_token":"4R1w16n8uDjpKyKSAIhmQ2MvGIgaxhi3RVxCMW0B","token_type":"Bearer","expires":1542036163,"expires_in":3600})
+  },
+  getPosts: (req,res) => {
+    res.json({"allowed_privileges":["read","search"]})
+  },
+  getGeos: (req,res) => {
+    fs.readFile(__dirname+'/../js/geojson.js', "utf8", function(err, data){
+        if(err) throw err;
+        res.json(JSON.parse(data));
+    });
+  },
 };
 
 function updateReadout(ctrl) {

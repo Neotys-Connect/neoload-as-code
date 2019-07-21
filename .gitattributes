@@ -1,0 +1,7 @@
+* text=auto
+
+# these explicit binary switches are to support Windows, which injects CRLFs :(
+*.sh binary
+*.env binary
+*.yaml binary
+Dockerfile binary
