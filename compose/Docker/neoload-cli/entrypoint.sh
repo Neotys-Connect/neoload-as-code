@@ -81,8 +81,10 @@ if [ ! -z "$YAML_FILEPATH" ]; then # not empty
     YAML_NAME=$(basename "$YAML_FILEPATH")
     SCENARIO_NAME=$SCENARIO
     HOST_IP=$(dig +short host.docker.internal | grep '^[.0-9]*$')
+    ADD_HOST_DOCKER_INTERNAL=
     if [ -z "$HOST_IP" ]; then
       HOST_IP=$(ip route show | awk '/default/ {print $3}')
+      ADD_HOST_DOCKER_INTERNAL=" --add-host host.docker.internal:$HOST_IP "
     fi
     echo "
 cp -R /src_project/** $CTRL_PROJECT_HOME
@@ -110,6 +112,7 @@ cd $CTRL_PROJECT_HOME && /home/neoload/neoload/bin/NeoLoadCmd -project $CTRL_PRO
               -v $LOGS_DIR_HOST:/home/neoload/.neotys/neoload/v6.10/logs \
               -v "$YAML_BASE_DIR_HOST":/src_project/ \
               --add-host localhost:$HOST_IP \
+              $ADD_HOST_DOCKER_INTERNAL \
               -e CONTROLLER_XMX=-Xmx768m \
               --entrypoint "/bin/sh" $NL_CONTROLLER_DOCKER_IMAGENAME \
               /$CONF_VARS_DIR_NAME/current-controller-entrypoint.sh &
