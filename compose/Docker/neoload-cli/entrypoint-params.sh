@@ -74,8 +74,15 @@ LOGS_DIR_HOST=./.logs
 NL_OUT_LOG_FILEPATH=$LOGS_DIR_HOST/neoload-out.log
 
 BASE_DIR=/neoload-as-code
-BASE_DIR_HOST=$(docker inspect --format "{{ range .Mounts }}{{ if eq .Destination \"$BASE_DIR\" }}{{ .Source }}{{ end }}{{ end }}" $(docker ps -a -q --filter "name=neotys-examples-cli-params" --filter "status=running" --format="{{.ID}}"))
-echo "BASE_DIR_HOST: $BASE_DIR_HOST"
+if [ -z "$BASE_DIR_HOST" ]; then
+  echo "getting BASE_DIR_HOST from inspect"
+	BASE_DIR_HOST=$(docker inspect --format "{{ range .Mounts }}{{ if eq .Destination \"$BASE_DIR\" }}{{ .Source }}{{ end }}{{ end }}" $(docker ps -a -q --filter "name=neotys-examples-cli-params" --filter "status=running" --format="{{.ID}}"))
+  echo "BASE_DIR_HOST: $BASE_DIR_HOST"
+fi
+if [ "$BASE_DIR_HOST" == "./" ]; then
+  BASE_DIR_HOST=$(pwd)
+  echo "BASE_DIR_HOST[pwd]: $BASE_DIR_HOST"
+fi
 
 CLI_BUILT=false
 build_the_cli() {
@@ -109,6 +116,7 @@ else
       echo "Please provide your actual API token, be careful not to just copy-n-paste commands :)"
       bail 5502
     fi
+    echo "initing..."
     build_the_cli
     #ls -latr $BASE_DIR
     BASE_DIR_HOST=$BASE_DIR_HOST NLW_TOKEN=$TOKEN docker-compose --file $BASE_DIR/$COMPOSE_YAML_FILE --log-level INFO run neoload-cli
@@ -117,6 +125,10 @@ else
     if [[ ! -z "$SCENARIO" && ! -z "$FILE" ]]; then # not empty
       FILE=$BASE_DIR/$FILE
       FILEPATH="$( cd "${FILE%/*}" && pwd )"/"${FILE##*/}"
+
+      #echo "params Being Listing config dir"
+      #ls -latr $BASE_DIR/.conf
+      #echo "params End Listing config dir"
 
       build_the_cli
       BASE_DIR_HOST=$BASE_DIR_HOST YAML=$FILEPATH SCN=$SCENARIO docker-compose --file $BASE_DIR/$COMPOSE_YAML_FILE --log-level WARNING run neoload-cli &

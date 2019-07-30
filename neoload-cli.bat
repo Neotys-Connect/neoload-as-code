@@ -16,17 +16,12 @@ if not exist %LOGS_DIR_HOST% mkdir %LOGS_DIR_HOST%
 del /f /q %LOGS_DIR_HOST%\*
 endlocal
 
-SET BASE_DIR_HOST=%BASE_DIR_HOST:\=/%
-SET BASE_DIR_HOST=%BASE_DIR_HOST::=%
-SET BASE_DIR_HOST=//%BASE_DIR_HOST%
-SET BASE_DIR_HOST=%BASE_DIR_HOST:C=c%
-SET BASE_DIR_HOST=%BASE_DIR_HOST:users=Users%
-
+SET COMPOSE_CONVERT_WINDOWS_PATHS=1
 SET NL_CLI_PARAMS=%*
+
 @start /b cmd /c docker-compose --file examples.yaml --log-level ERROR run neotys-examples-cli-params
 
-
-powershell -noprofile -command "Start-Sleep -s 2"
+powershell -noprofile -command "Start-Sleep -s 10"
 
 set "PID="
 for /f "tokens=2" %%A in ('tasklist ^| findstr /i "docker-compose" 2^>NUL') do @Set "PID=%%A"

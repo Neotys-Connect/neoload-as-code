@@ -7,10 +7,11 @@ services:
       context: ./compose/Docker/neoload-cli
       dockerfile: Dockerfile
     environment:
+      - BASE_DIR_HOST=$BASE_DIR_HOST
       - NL_CLI_PARAMS=$NL_CLI_PARAMS
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock ## docker-in-docker control
-      - $BASE_DIR_HOST:/neoload-as-code ## for configuration persistence and DinD builds
+      - ./:/neoload-as-code ## for configuration persistence and DinD builds
     networks:
       - neoload-examples
     entrypoint: /bin/sh
@@ -24,6 +25,7 @@ services:
       context: ./compose/Docker/neoload-cli
       dockerfile: Dockerfile
     environment:
+      - BASE_DIR_HOST=$BASE_DIR_HOST
       - NLW_TOKEN=$NLW_TOKEN
       - YAML_FILEPATH=$YAML
       - SCENARIO=$SCN
@@ -45,6 +47,8 @@ services:
     image: redis
     networks:
       - neoload-examples
+    volumes:
+      - ./:/project_home
     ports:
       - 6379:6379
 
