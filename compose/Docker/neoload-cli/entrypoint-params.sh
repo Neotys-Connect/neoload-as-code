@@ -76,7 +76,7 @@ NL_OUT_LOG_FILEPATH=$LOGS_DIR_HOST/neoload-out.log
 BASE_DIR=/neoload-as-code
 if [ -z "$BASE_DIR_HOST" ]; then
   echo "getting BASE_DIR_HOST from inspect"
-	BASE_DIR_HOST=$(docker inspect --format "{{ range .Mounts }}{{ if eq .Destination \"$BASE_DIR\" }}{{ .Source }}{{ end }}{{ end }}" $(docker ps -a -q --filter "name=neotys-examples-cli-params" --filter "status=running" --format="{{.ID}}"))
+	BASE_DIR_HOST=$(docker inspect --format "{{ range .Mounts }}{{ if eq .Destination \"$BASE_DIR\" }}{{ .Source }}{{ end }}{{ end }}" $(docker ps -a -q -l --filter "name=neotys-examples-cli-params" --format="{{.ID}}"))
   echo "BASE_DIR_HOST: $BASE_DIR_HOST"
 fi
 if [ "$BASE_DIR_HOST" == "./" ]; then
