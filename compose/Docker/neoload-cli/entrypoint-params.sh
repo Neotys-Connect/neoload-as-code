@@ -131,6 +131,7 @@ else
       #echo "params End Listing config dir"
 
       build_the_cli
+      echo 'running cli with full examples'
       BASE_DIR_HOST=$BASE_DIR_HOST YAML=$FILEPATH SCN=$SCENARIO docker-compose --file $BASE_DIR/$COMPOSE_YAML_FILE --log-level WARNING run neoload-cli &
       COMPID=$!
 
