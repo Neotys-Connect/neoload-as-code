@@ -1,8 +1,8 @@
-FROM docker:dind
+FROM docker/compose:1.24.0
 
 RUN apk update && apk add curl && apk add net-tools && apk add bind-tools
-RUN apk add py-pip && apk add python-dev libffi-dev openssl-dev gcc libc-dev make
-RUN pip install docker-compose
+#RUN apk add py-pip && apk add python-dev libffi-dev openssl-dev gcc libc-dev make
+#RUN pip install docker-compose
 
 RUN mkdir /neoload-cli
 
