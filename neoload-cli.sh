@@ -15,30 +15,31 @@ mkdir -p $LOGS_DIR_HOST
 rm -rf $LOGS_DIR_HOST/*
 #
 #
-#
+datestarted=$(date +%s)
 # for dev purposes
 #docker-compose --file examples.yaml build --force-rm neotys-examples-cli-params
 #docker-compose --file examples.yaml build --force-rm neoload-cli
 BASE_DIR_HOST=$BASE_DIR_HOST NL_CLI_PARAMS=$* docker-compose --file examples.yaml --log-level ERROR run neotys-examples-cli-params &
 COMPID=$!
-sleep 10
-#
-#
-#
-#
-#
-#
-#
+while true; do
+  sleep 1
+  clipsout=$(docker ps --format '{{.Names}}' | grep "neoload-cli-ctrl" | awk '{print $1}')
+  if [ ! -z "$clipsout" ]; then break; fi
+  datenow=$(date +%s)
+  waitedforsec=$((datenow-datestarted))
+  if [ $waitedforsec -gt 60 ]; then break; fi
+done
 URL_OPENED=false
 #
 while true; do
 #
   # check for out log containing URL to NLW test, launch once if found
-  if [ -f "$NL_OUT_LOG_FILEPATH" ]; then
-    URL=$(grep -Eio 'http[s]?://.*/overview' $NL_OUT_LOG_FILEPATH)
+  CTRLID=$(docker ps --filter="name=neoload-cli-ctrl" --format="{{.ID}}")
+  if [ ! -z "$CTRLID" ]; then
+    URL=$(docker logs $CTRLID | grep -Eio 'http[s]?://.*/overview')
     if [ ! -z "$URL" ] && ! $URL_OPENED; then
       URL_OPENED=true
-      echo "opening URL"
+      echo "opening URL: $URL"
       open $URL
     fi
   fi
@@ -48,7 +49,7 @@ while true; do
   sleep 1
 #
   # if neoload-cli container closed, move on ".org", ".net" > dr.evil
-  clipsout=$(docker ps --format '{{.Names}}' | grep "neoload-cli" | awk '{print $1}')
+  clipsout=$(docker ps --format '{{.Names}}' | grep "neoload-cli-ctrl" | awk '{print $1}')
   if [ -z "$clipsout" ]; then
     break
   fi
