@@ -32,6 +32,12 @@ CLI documentation and other links: [https://github.com/Neotys-Labs/neoload-cli#p
 
 ## Supporting Elements
 
+To get the latest version of these resources:
+```
+cd ~/Desktop/neoload-as-code/training
+git pull
+```
+
 *For these examples, we will be using the CLI to:*
  - Validate our as-code files locally
  - Start local infrastructure and attach to a NLW zone
