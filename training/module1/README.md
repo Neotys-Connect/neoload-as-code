@@ -1,6 +1,6 @@
 # NeoLoad as-code Training, Module 1: Running Your First as-code Test
 
-## Assumptions
+## Connecting the CLI to the NeoLoad Web Platform
 ```
 cd ~/Desktop/neoload-as-code/training
 
@@ -10,7 +10,30 @@ export NLW_URL=http://nlweb.shared:8080/
 
 # connect to NeoLoad Web and use simple infrastructure spec
 neoload login --url $NLW_URL $NLW_TOKEN
+```
+
+## All-in-one Command
+```
+sudo neoload test-settings --scenario sanityScenario create NewTest1 \
+             project --path ./module1 upload \
+             docker --addhosts nlweb.shared attach \
+             run
+
+```
+NOTE: the 'sudo' command is only needed for docker BYO infrastructure AND when
+the current user does not have permission to run native 'docker...' commands
+
+## Explanation of each command
+```
+# create a new test's settings using defaults
 neoload test-settings --scenario sanityScenario create NewTest1
+
+# add project files to the test
 neoload project --path ./module1 upload
+
+# spin up a controller and load generator to act as BYO infrastructure
+sudo neoload docker --addhosts nlweb.shared attach
+
+# kick off the test
 neoload run
 ```
