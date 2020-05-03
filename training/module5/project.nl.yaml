@@ -25,7 +25,7 @@ user_paths:
               jsonpath: $[0].lon
             - name: server_date
               from: header
-              regexp: date: (.*?)\n
+              regexp: "date: (.*?)\n"
 
   actions:
     steps:
