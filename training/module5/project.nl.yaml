@@ -1,0 +1,77 @@
+name: NeoLoad-as-code-module-5
+
+servers:
+- name: osm
+  host: nominatim.openstreetmap.org
+  scheme: https
+- name: httpbin
+  host: httpbin.org
+
+user_paths:
+- name: geosearch_get_and_put
+  init:
+    steps:
+    - transaction:
+        name: External Geo-lookup
+        description: Call Open Street Maps to translate city names to lat/lon
+        steps:
+        - request:
+            server: osm
+            url: /search?format=json&q=Boston
+            extractors:
+            - name: latitude
+              jsonpath: $[0].lat
+            - name: longitude
+              jsonpath: $[0].lon
+            - name: server_date
+              from: header
+              regexp: date: (.*?)\n
+
+  actions:
+    steps:
+    - think_time: 100ms
+
+    - transaction:
+        name: Get lat/long from some service
+        description: Echo lat/long back
+        steps:
+        - request:
+            server: httpbin
+            url: /get?lat=${latitude}&lon=${longitude}
+
+    - think_time: 100ms
+
+    - transaction:
+        name: Put lat/long to some service
+        description: Echo lat/long back
+        steps:
+        - request:
+            server: httpbin
+            url: /put
+            method: PUT
+            headers:
+            - accept: application/json
+            - Content-Type: application/json
+            body: |
+              {
+                "coordinates": {
+                  "latitude": ${latitude},
+                  "longitude": ${longitude}
+                }
+              }
+
+populations:
+- name: pop
+  user_paths:
+  - name: geosearch_get_and_put
+
+scenarios:
+- name: sanityScenario
+  populations:
+  - name: pop
+    rampup_load:
+      min_users: 1
+      max_users: 5
+      increment_users: 1
+      increment_every: 2s
+      duration: 1m
