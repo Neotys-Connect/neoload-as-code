@@ -21,7 +21,7 @@ neoload test-settings --scenario sanityScenario --naming-pattern \#\$\{runID\} c
 neoload project --path ./module1 upload
 
 # spin up a controller and load generator to act as BYO infrastructure
-sudo neoload docker --addhosts nlweb.shared attach
+sudo neoload docker attach
 
 # kick off the test
 neoload run
