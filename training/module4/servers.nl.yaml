@@ -1,0 +1,6 @@
+servers:
+- name: osm
+  host: nominatim.openstreetmap.org
+  scheme: https
+- name: httpbin
+  host: httpbin.org
