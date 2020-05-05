@@ -1,0 +1,50 @@
+name: NeoLoad-as-code-module-2a
+
+servers:
+- name: osm
+  host: nominatim.openstreetmap.org
+  scheme: https
+
+variables:
+- constant:
+    name: SEARCH_API_FORMAT
+    value: format=json&
+- file:
+    name: cities
+    path: cities.csv
+    start_from_line: 1
+    delimiter: ","
+    is_first_line_column_names: false
+    column_names: ["City"]
+
+sla_profiles:
+- name: geo_3rdparty_sla
+  thresholds:
+  - avg-resp-time warn >= 100ms fail >= 500ms per interval
+  - error-rate warn >= 2% fail >= 5% per test
+
+user_paths:
+- name: geosearch_get
+  actions:
+    steps:
+    - request:
+        server: osm
+        url: /search?${SEARCH_API_FORMATq=${cities.City}
+        sla_profile: geo_3rdparty_sla
+    - delay: 1s
+
+populations:
+- name: pop1
+  user_paths:
+  - name: geosearch_get
+
+scenarios:
+- name: sanityScenario
+  populations:
+  - name: pop1
+    rampup_load:
+      min_users: 1
+      max_users: 5
+      increment_users: 1
+      increment_every: 2s
+      duration: 1m
