@@ -1,0 +1,6 @@
+servers:
+- name: osm
+  host: ${osm_dynamic_hostname}
+  scheme: https
+- name: httpbin
+  host: httpbin.org

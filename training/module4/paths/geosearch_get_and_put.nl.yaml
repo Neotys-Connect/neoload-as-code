@@ -1,0 +1,55 @@
+user_paths:
+- name: geosearch_get_and_put
+  init:
+    steps:
+    - transaction:
+        name: External Geo-lookup
+        description: Call Open Street Maps to translate city names to lat/lon
+        steps:
+        - request:
+            server: osm
+            url: /search?format=json&q=${cities.CityName}
+            sla_profile: geo_3rdparty_sla
+            extractors:
+            - name: latitude
+              jsonpath: $[0].lat
+            - name: longitude
+              jsonpath: $[0].lon
+            - name: server_date
+              from: header
+              regexp: "date: (.*?)\n"
+
+  actions:
+    steps:
+    - think_time: 100ms
+
+    - transaction:
+        name: Get lat/long from some service
+        description: Echo lat/long back
+        steps:
+        - request:
+            server: httpbin
+            url: /get?lat=${latitude}&lon=${longitude}
+            sla_profile: mocks_sla
+
+    - think_time: 100ms
+
+    - transaction:
+        name: Put lat/long to some service
+        description: Echo lat/long back
+        steps:
+        - request:
+            server: httpbin
+            url: /put
+            method: PUT
+            headers:
+            - accept: application/json
+            - Content-Type: application/json
+            sla_profile: mocks_sla
+            body: |
+              {
+                "coordinates": {
+                  "latitude": ${latitude},
+                  "longitude": ${longitude}
+                }
+              }
