@@ -1,0 +1,29 @@
+variables:
+- constant:
+    name: geosearch_baseurl
+    value: search?format=json
+- file:
+    name: cities
+    column_names: ["CityName"]
+    is_first_line_column_names: false
+    start_from_line: 1
+    delimiter: ";"
+    path: cities.csv
+    change_policy: each_iteration
+    scope: global
+    order: any
+    out_of_value: cycle
+- counter:
+    name: counter_variable
+    start: 0
+    end: 100
+    increment: 2
+    change_policy: each_iteration
+    scope: local
+    out_of_value: cycle
+- random_number:
+    name: random_number_variable
+    min: 0
+    max: 999
+    predictable: false
+    change_policy: each_request

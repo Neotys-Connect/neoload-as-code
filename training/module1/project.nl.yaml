@@ -1,7 +1,7 @@
 name: NeoLoad-as-code-module-1
 
 user_paths:
-- name: ex_2_0_geosearch_get
+- name: geosearch_get
   actions:
     steps:
     - transaction:
@@ -24,7 +24,7 @@ sla_profiles: # defaults for dev/qa systems; can be overridden by additional sla
 populations:
 - name: popGets
   user_paths:
-  - name: ex_2_0_geosearch_get
+  - name: geosearch_get
 
 scenarios:
 - name: sanityScenario

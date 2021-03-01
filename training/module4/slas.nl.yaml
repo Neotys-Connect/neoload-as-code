@@ -1,0 +1,9 @@
+sla_profiles:
+- name: geo_3rdparty_sla
+  thresholds:
+  - avg-resp-time warn >= 100ms fail >= 500ms per interval
+  - error-rate warn >= 2% fail >= 5% per test
+- name: mocks_sla
+  thresholds:
+  - avg-resp-time warn >= 100ms fail >= 500ms per interval
+  - error-rate warn >= 1% fail >= 2% per test
