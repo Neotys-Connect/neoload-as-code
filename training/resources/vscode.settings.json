@@ -1,0 +1,27 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": ["*.nl.json"],
+            "url": "file:///Users/paul/git/paulsbruce/neoload-as-code/training/resources/as-code.latest.schema.json"
+        }
+    ],
+    "yaml.schemas": {
+        "file:///Users/paul/git/paulsbruce/neoload-as-code/training/resources/as-code.latest.schema.json": "*.nl.yaml"
+    },
+    "yaml.format.enable": true,
+    "yaml.validate": true,
+    "yaml.hover": true,
+    "yaml.completion": true,
+    "runOnSave.statusMessageTimeout": 3000,
+    "runOnSave.commands": [
+        {
+            "globMatch": "**/*.nl.yaml",
+            "commandBeforeSaving": "clear",
+            //"command": "neoload validate ${fileDirname}", // ${file} or ${fileDirname}
+            "command": "neoload validate --schema-url /Users/paul/git/neotys-labs/neoload-cli/resources/as-code.latest.schema.json --refresh ${fileDirname}",
+            "runIn": "terminal",
+            "runningStatusMessage": "Validating NeoLoad DSL syntax",
+            "finishStatusMessage": "Validation finished: $?"
+        }
+    ]
+}
