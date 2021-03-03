@@ -1,7 +1,7 @@
 {
     "yaml.schemas": {
-        "file:///home/orasilabs/neoload-as-code/training/resources/as-code.latest.schema.json": "*.nl.yaml",
-        "file:///home/orasilabs/neoload-as-code/training/resources/as-code.latest.schema.json": "default.yaml"
+        "https://raw.githubusercontent.com/Neotys-Connect/neoload-as-code/master/training/resources/as-code.latest.schema.json":
+        ["*.nl.yaml", "default.yaml"]
     },
     "yaml.schemaStore.enable": false,
     "yaml.format.enable": true,
@@ -13,7 +13,15 @@
         {
             "globMatch": "**/*.nl.yaml",
             "commandBeforeSaving": "clear",
-            "command": "neoload validate --schema-url ${workspaceFolder}/training/resources/as-code.latest.schema.json ${fileDirname}",
+            "command": "neoload validate ${fileDirname}",
+            "runIn": "terminal",
+            "runningStatusMessage": "Validating NeoLoad DSL syntax",
+            "finishStatusMessage": "Validation finished: $?"
+        },
+        {
+            "globMatch": "**/default.yaml",
+            "commandBeforeSaving": "clear",
+            "command": "neoload validate ${fileDirname}",
             "runIn": "terminal",
             "runningStatusMessage": "Validating NeoLoad DSL syntax",
             "finishStatusMessage": "Validation finished: $?"
