@@ -1,6 +1,6 @@
 name: NeoLoad-as-code-module-4
 includes:
-- paths/geosearch_get_and_put.yaml
+- paths/geosearch_get_and_put.nl.yaml
 - envs/uat/servers.nl.yaml
 - envs/uat/variables.nl.yaml
 - envs/uat/slas.nl.yaml

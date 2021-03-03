@@ -10,3 +10,6 @@ variables:
     scope: global
     order: any
     out_of_value: cycle
+- constant:
+    name: osm_dynamic_hostname
+    value: nominatim.openstreetmap.org
