@@ -1,6 +1,7 @@
 {
     "yaml.schemas": {
-        "file:///home/orasilabs/neoload-as-code/training/resources/as-code.latest.schema.json": "*.nl.yaml"
+        "file:///home/orasilabs/neoload-as-code/training/resources/as-code.latest.schema.json": "*.nl.yaml",
+        "file:///home/orasilabs/neoload-as-code/training/resources/as-code.latest.schema.json": "default.yaml"
     },
     "yaml.schemaStore.enable": false,
     "yaml.format.enable": true,
