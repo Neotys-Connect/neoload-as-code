@@ -17,7 +17,7 @@ user_paths:
               jsonpath: $[0].lon
             - name: server_date
               from: header
-              regexp: "date: (.*?)\n"
+              regexp: 'date: (.*?)\n'
 
   actions:
     steps:
@@ -44,7 +44,7 @@ user_paths:
             method: PUT
             headers:
             - accept: application/json
-            - Content-Type: application/json
+            - Content-Type: 'application/json'
             sla_profile: mocks_sla
             body: |
               {
