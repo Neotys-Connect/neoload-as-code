@@ -1,0 +1,45 @@
+name: NeoLoad-as-code-module-5b
+includes:
+- variables.nl.yaml
+
+servers:
+- name: osm
+  host: nominatim.openstreetmap.org
+  scheme: https
+
+user_paths:
+- name: geosearch_withdata
+  actions:
+    steps:
+    - transaction:
+        name: External Geo-lookup with Dynamic Data
+        description: Call Open Street Maps to translate city names to lat/lon
+        steps:
+        - request:
+            server: osm
+            url: /${geosearch_baseurl}&q=${cities.CityName}
+            headers:
+            - test-iteration: ${counter_variable}
+            - test-random: ${random_number_variable}
+            assertions:
+            - contains: ${cities.CityName}
+              regexp: true
+            - jsonpath: $[0].place_id
+
+    - think_time: 1000ms
+
+populations:
+- name: pop
+  user_paths:
+  - name: geosearch_withdata
+
+scenarios:
+- name: sanityScenario
+  populations:
+  - name: pop
+    rampup_load:
+      min_users: 1
+      max_users: 5
+      increment_users: 1
+      increment_every: 2s
+      duration: 1m

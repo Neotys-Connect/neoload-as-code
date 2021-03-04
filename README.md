@@ -1,6 +1,7 @@
 # NeoLoad as-code Tutorials and Examples
 
  - [Training](training/)
+ - [as-code DSL reference docs](https://github.com/Neotys-Labs/neoload-models/blob/v3/neoload-project/doc/v3/project.md)
 
 This repository contains a set of training examples for NeoLoad as-code, the
  YAML-based Domain Specific Language (DSL) for load testing.
