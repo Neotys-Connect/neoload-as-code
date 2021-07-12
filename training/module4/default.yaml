@@ -5,13 +5,13 @@ includes:
 - envs/uat/variables.nl.yaml
 - envs/uat/slas.nl.yaml
 
-# test:
-#   one: two three
-
 populations:
 - name: pop
   user_paths:
   - name: geosearch_get_and_put
+- name: pop2
+  user_paths:
+  - name: geosearch_get_and_put # different user path
 
 scenarios:
 - name: sanityScenario
@@ -23,3 +23,6 @@ scenarios:
       increment_users: 1
       increment_every: 2s
       duration: 1m
+  - name: pop2
+    constant_load:
+      users: 10

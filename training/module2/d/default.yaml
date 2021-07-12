@@ -1,0 +1,140 @@
+name: NeoLoad-as-code-module-2d
+
+servers:
+- name: sp_app
+  host: saml-example.neotys.perfreleng.org
+- name: idp
+  host: perfreleng.us.auth0.com
+  scheme: https
+
+variables:
+- javascript:
+    name: credentials
+    script: "function evaluate() {\n\treturn new function() {\n\t\tthis.username = encodeURIComponent(\"testing@perfreleng.org\");\n\t\tthis.password = \"NeoLoad123!\";\n\t};\n}"
+    change_policy: each_iteration
+# - file:
+#     name: credentials_file
+#     path: credentials.data
+#     start_from_line: 1
+#     delimiter: "|"
+#     is_first_line_column_names: true
+
+user_paths:
+- name: saml_login_and_logout
+  actions:
+    steps:
+    - transaction:
+        name: App Login Start
+        steps:
+        - request:
+            server: sp_app
+            url: /login
+            method: GET
+            extractors:
+            - name: idp_authorize
+              from: header
+              regexp: "[Ll]ocation: (?:https*://[^/]*)*(.*)[\\s\\r\\n]"
+        - think_time: 1s
+
+    - transaction:
+        name: SAML Login
+        steps:
+        - request:
+            server: idp
+            url: /${idp_authorize}
+            method: GET
+            extractors:
+            - name: idp_u_login
+              from: header
+              regexp: "[Ll]ocation: (?:https*://[^/]*)*(.*)[\\s\\r\\n]"
+            - name: state_token
+              from: header
+              regexp: "[Ll]ocation: /u/login\\?state=(.*)[\\&\\s\\r\\n]"
+        - think_time: 1s
+
+        - request:
+            server: idp
+            url: /${idp_u_login}
+            method: GET
+        - think_time: 1s
+
+        - request:
+            server: idp
+            url: /${idp_u_login}
+            method: POST
+            headers:
+            - content-type: application/x-www-form-urlencoded
+            # - te: trailers
+            # - accept-language: en-US,en;q=0.5
+            # - origin: https://perfreleng.us.auth0.com
+            # - upgrade-insecure-requests: "1"
+            # - accept-encoding: br,deflate,gzip
+            # - accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+            # - user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:89.0) Gecko/20100101 Firefox/89.0
+            body: |
+              state=${state_token}&username=${credentials.username}&password=${credentials.password}&action=default
+            extractors:
+            - name: idp_authorize_resume
+              from: header
+              regexp: "[Ll]ocation: (?:https*://[^/]*)*(.*)[\\s\\r\\n]"
+
+    - transaction:
+        name: App Home
+        steps:
+        - request:
+            server: idp
+            url: /${idp_authorize_resume}
+            method: GET
+            extractors:
+            - name: sp_callback
+              from: header
+              regexp: "[Ll]ocation: (?:https*://[^/]*)*(.*)[\\s\\r\\n]"
+
+        - request:
+            server: sp_app
+            url: /${sp_callback}
+            method: GET
+            extractors:
+            - name: sp_home
+              from: header
+              regexp: "[Ll]ocation: (?:https*://[^/]*)*(.*)[\\s\\r\\n]"
+
+        - request:
+            server: sp_app
+            url: /${sp_home}
+            method: GET
+            assertions:
+            - contains: qsLogoutBtn
+
+    - transaction:
+        name: App Logout
+        steps:
+        - request:
+            server: sp_app
+            url: /logout
+            method: GET
+            extractors:
+            - name: idp_logout
+              from: header
+              regexp: "[Ll]ocation: (?:https*://[^/]*)*(.*)[\\s\\r\\n]"
+        - think_time: 1s
+        - request:
+            server: idp
+            url: /${idp_logout}
+            method: GET
+            assertions:
+            - contains: "Found. Redirecting to"
+      
+              
+
+populations:
+- name: pop1
+  user_paths:
+  - name: saml_login_and_logout
+
+scenarios:
+- name: sanityScenario
+  populations:
+  - name: pop1
+    constant_load:
+      users: 1

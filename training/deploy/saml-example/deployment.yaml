@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: saml
+  # labels:
+  #   run: saml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saml-example-deployment
+  namespace: saml
+  labels:
+    app: saml-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saml-example
+  template:
+    metadata:
+      labels:
+        app: saml-example
+    spec:
+      containers:
+      - name: saml-example
+        image: paulsbruce/auth0-servlet-01-login:latest
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: saml-example-service
+  namespace: saml
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: saml-example.neotys.perfreleng.org
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+spec:
+  type: LoadBalancer
+  selector:
+    app: saml-example
+  ports:
+    - name: saml-example-prod
+      protocol: TCP
+      port: 80
+      targetPort: 3000
