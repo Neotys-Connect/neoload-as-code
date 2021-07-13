@@ -29,6 +29,11 @@ pipeline {
           args "--add-host ${env.nlw_host}:${env.host_ip} -e HOME=${env.WORKSPACE} -e PYTHONUNBUFFERED=1"
         }
       }
+
+
+
+
+
       stages {
         stage('Prep project files') {
           steps {
@@ -38,20 +43,6 @@ pipeline {
                 git url: 'https://github.com/paulsbruce/toscawebtoneoload.git'
             }
             sh 'ls -latr project/'
-          }
-        }
-        stage('Prepare agent') {
-          steps {
-            sh 'neoload --version'
-            sh 'printenv'
-            withCredentials([string(credentialsId: 'NLW_TOKEN', variable: 'NLW_TOKEN')]) {
-              sh "neoload login --url ${env.api_url} $NLW_TOKEN"
-            }
-          }
-        }
-        stage('Prepare Neoload CLI') {
-          steps {
-            sh "neoload test-settings --zone ${env.zone_id} --lgs 1 --scenario sanityScenario createorpatch 'example-Jenkins-module5-${env.agent_name}'"
           }
         }
         stage('Prepare Test Assets') {
@@ -80,6 +71,23 @@ sla_profiles:
             stash includes: 'd.*.yaml', name: 'dynamics'
           }
         }
+
+
+
+        stage('Prepare agent') {
+          steps {
+            sh 'neoload --version'
+            sh 'printenv'
+            withCredentials([string(credentialsId: 'NLW_TOKEN', variable: 'NLW_TOKEN')]) {
+              sh "neoload login --url ${env.api_url} $NLW_TOKEN"
+            }
+          }
+        }
+        stage('Prepare Neoload CLI') {
+          steps {
+            sh "neoload test-settings --zone ${env.zone_id} --lgs 1 --scenario sanityScenario createorpatch 'example-Jenkins-module5-${env.agent_name}'"
+          }
+        }
         stage('Upload Test Assets') {
           steps {
             dir('project/') {
@@ -89,6 +97,9 @@ sla_profiles:
             sh "neoload status"
           }
         }
+
+
+
         stage('Run a sanity scenario') {
           steps {
             script {
@@ -114,6 +125,9 @@ sla_profiles:
             }
           }
         }
+
+
+        
         stage('Run Test') {
           stages {
             stage('Kick off test async') {

@@ -54,7 +54,7 @@ user_paths:
 
         - request:
             server: idp
-            url: /${idp_u_login}
+            url: ${my_url}
             method: GET
         - think_time: 1s
 
@@ -64,13 +64,6 @@ user_paths:
             method: POST
             headers:
             - content-type: application/x-www-form-urlencoded
-            # - te: trailers
-            # - accept-language: en-US,en;q=0.5
-            # - origin: https://perfreleng.us.auth0.com
-            # - upgrade-insecure-requests: "1"
-            # - accept-encoding: br,deflate,gzip
-            # - accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
-            # - user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:89.0) Gecko/20100101 Firefox/89.0
             body: |
               state=${state_token}&username=${credentials.username}&password=${credentials.password}&action=default
             extractors:
