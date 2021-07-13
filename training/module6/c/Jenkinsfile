@@ -11,7 +11,7 @@ pipeline {
   }
 
   parameters {
-    base64File 'small'
+    file 'small'
   }
 
   stages {
