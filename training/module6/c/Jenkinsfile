@@ -55,9 +55,7 @@ pipeline {
         }
         stage('Prepare Test Assets') {
           steps {
-            withFileParameter('test_data') {
-              sh 'cp $test_data input_cities.csv'
-            }
+            sh 'cp $test_data input_cities.csv'
             writeFile(file: "d.variables.yaml", text:"""
 variables:
 - file:
