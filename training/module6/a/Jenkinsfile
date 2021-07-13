@@ -42,7 +42,7 @@ pipeline {
             dir('project/') {
                 git url: 'https://github.com/paulsbruce/toscawebtoneoload.git'
             }
-            sh 'ls -latr project/'
+            //sh 'ls -latr project/'
           }
         }
         stage('Prepare Test Assets') {
@@ -134,6 +134,14 @@ sla_profiles:
             }
           }
         }
+        stage('Hypothesize - Wait for resources to unlock') {
+            steps {
+                script {
+                    sleep(time:15,unit:"SECONDS")
+                }
+            }
+        }
+
 
 
 
