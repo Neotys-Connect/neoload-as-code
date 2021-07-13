@@ -85,7 +85,7 @@ sla_profiles:
         }
         stage('Prepare Neoload CLI') {
           steps {
-            sh "neoload test-settings --zone ${env.zone_id} --lgs 1 --scenario sanityScenario createorpatch 'example-Jenkins-module5-${env.agent_name}'"
+            sh "neoload test-settings --zone ${env.zone_id} --lgs 1 --scenario sanity createorpatch 'example-Jenkins-module6-${env.agent_name}'"
           }
         }
         stage('Upload Test Assets') {
@@ -127,7 +127,7 @@ sla_profiles:
         }
 
 
-        
+
         stage('Run Test') {
           stages {
             stage('Kick off test async') {
