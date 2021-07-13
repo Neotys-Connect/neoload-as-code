@@ -58,6 +58,10 @@ scenarios:
       increment_users: 1
       increment_every: 5s
       duration: ${env.full_test_duration_mins}m
+  apm_configuration:
+    dynatrace_tags:
+    - "neotys-cpt"
+
 - name: sanity
   populations:
   - name: StandardPop
