@@ -11,7 +11,7 @@ pipeline {
   }
 
   parameters {
-    file name:'test_data', description:'contains list of projects to be build'
+    base64File 'test_data'
   }
 
   stages {
@@ -55,7 +55,9 @@ pipeline {
         }
         stage('Prepare Test Assets') {
           steps {
-            sh 'cp $test_data input_cities.csv'
+            withFileParameter('test_data') {
+              sh 'cp $test_data input_cities.csv'
+            }
             writeFile(file: "d.variables.yaml", text:"""
 variables:
 - file:
