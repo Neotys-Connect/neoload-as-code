@@ -58,6 +58,15 @@ scenarios:
       increment_users: 1
       increment_every: 5s
       duration: ${env.full_test_duration_mins}m
+- name: sanity
+  populations:
+  - name: StandardPop
+    rampup_load:
+      min_users: 1
+      max_users: 2
+      increment_users: 1
+      increment_every: 5s
+      duration: 3m
             """)
             writeFile(file: "d.slas.yaml", text:"""
 sla_profiles:
