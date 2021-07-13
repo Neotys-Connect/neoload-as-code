@@ -94,7 +94,7 @@ sla_profiles:
         }
         stage('Prepare Neoload CLI') {
           steps {
-            sh "neoload test-settings --zone ${env.zone_id} --lgs 1 --scenario sanity createorpatch 'example-Jenkins-module6-${env.agent_name}'"
+            sh "neoload test-settings --zone ${env.zone_id} --lgs 1 --scenario sanityTOSCA createorpatch 'example-Jenkins-module6-${env.agent_name}'"
           }
         }
         stage('Upload Test Assets') {
@@ -116,7 +116,7 @@ sla_profiles:
               try {
                 wrap([$class: 'BuildUser']) {
                   sanityCode = sh(script: """neoload run \
-                        --scenario sanity \
+                        --scenario sanityTOSCA \
                         --name \"sanity-${env.JOB_NAME}-${env.BUILD_NUMBER}-${env.agent_name}\" \
                         --description \"Started by Jenkins user $BUILD_USER on ${env.agent_name}\" \
                         --as-code d.overrides.yaml \
