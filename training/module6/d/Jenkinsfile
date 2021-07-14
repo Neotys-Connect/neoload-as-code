@@ -8,6 +8,7 @@ pipeline {
     zone_id="defaultzone"
     full_test_max_vus = 5
     full_test_duration_mins = 3
+    reporting_timespan = '10%-90%'
   }
 
   parameters {
@@ -133,6 +134,7 @@ pipeline {
                       logs_url = sh(script: "neoload logs-url cur", returnStdout: true).trim()
                       echo "Logs url: ${logs_url}"
                       sh "neoload fastfail --max-failure 25 slas cur"
+                      //sh "neoload fastfail --max-failure 25 --stop-command './kill_script.sh' slas cur"
                     }
                   }
                 }
@@ -141,6 +143,56 @@ pipeline {
                     script {
                       env.exitCode = sh(script: "neoload wait cur", returnStatus: true)
                       print "Final status code was ${env.exitCode}"
+                    }
+                    sh "mkdir -p reports"
+                    script {
+                      sh """neoload report --filter='timespan=${env.reporting_timespan}' \
+                            --out-file reports/neoload-single-data.json \
+                            cur
+                        """
+
+                      sh """neoload report \
+                            --json-in reports/neoload-single-data.json \
+                            --template builtin:transactions-csv \
+                            --out-file reports/neoload-transactions.csv \
+                            cur
+                        """
+
+                      sh """neoload report \
+                            --json-in reports/neoload-single-data.json \
+                            --template reporting/jinja/sample-custom-report.html.j2 \
+                            --out-file reports/neoload-results.html \
+                            cur
+                        """
+                      publishHTML (target: [
+                          allowMissing: false,
+                          alwaysLinkToLastBuild: false,
+                          keepAll: true,
+                          reportDir: 'reports',
+                          reportFiles: 'neoload-results.html',
+                          reportName: "NeoLoad Test Results"
+                      ])
+
+                      sh """neoload report --filter='timespan=${env.reporting_timespan};results=-5' \
+                            --out-file reports/neoload-trend-data.json \
+                            --type trends \
+                            cur
+                        """
+                      sh """neoload report \
+                            --json-in reports/neoload-trend-data.json \
+                            --template reporting/jinja/sample-trends-report.html.j2 \
+                            --out-file reports/neoload-trends.html \
+                            --type trends \
+                            cur
+                        """
+                      publishHTML (target: [
+                          allowMissing: false,
+                          alwaysLinkToLastBuild: false,
+                          keepAll: true,
+                          reportDir: 'reports',
+                          reportFiles: 'neoload-trends.html',
+                          reportName: "NeoLoad Trends (Custom)"
+                        ])
                     }
                   }
                 }
@@ -151,7 +203,8 @@ pipeline {
             always {
               sh "neoload test-results junitsla"
               junit testResults: 'junit-sla.xml', allowEmptyResults: true
-              archiveArtifacts artifacts: 'd.*.yaml'
+              archiveArtifacts artifacts: 'project/*.*'
+              archiveArtifacts artifacts: 'reports/*.*'
             }
           }
         }
