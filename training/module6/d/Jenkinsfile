@@ -99,6 +99,7 @@ pipeline {
                   error "Sanity test failed so not proceeding to full test!"
                 else
                   sh "neoload test-results delete cur" // get rid of successful sanity run results
+                  sleep(time:30,unit:"SECONDS")
               }
             }
           }
