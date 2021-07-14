@@ -1,0 +1,8 @@
+@Library('neoload-as-code') _
+
+runAPILoadTest(
+  api_url: 'https://nominatim.openstreetmap.org/search?format=json&q=Boston',
+  response_contains: 'Boston, Suffolk County, Massachusetts',
+  concurrency_vus: 10,
+  duration_min: 2
+)
