@@ -37,13 +37,14 @@ def call(Map params) {
               error "You cannot run longer than 60mins with this type of pipeline."
 
 
-            env.LG_COUNT = 1
+            LG_COUNT = 1
             vus_per_lg_max = 500
-            env.LG_COUNT = Math.ceil(env.CONCURRENCY_VUS.toInteger() / vus_per_lg_max)
+            LG_COUNT = Math.ceil(env.CONCURRENCY_VUS.toInteger() / vus_per_lg_max)
             
-            if(env.LG_COUNT > 3)
+            if(LG_COUNT > 3)
               error "Your concurrency requires ${env.LG_COUNT} but we only allow at most 3"
-              
+            
+            env.LG_COUNT = LG_COUNT
           }
         }
       }
