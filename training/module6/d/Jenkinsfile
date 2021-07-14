@@ -63,10 +63,10 @@ pipeline {
             sh 'cp training/module6/d/api.template.nl.yaml project/default.yaml'
             script {
               ['API_URL','RESPONSE_CONTAINS','CONCURRENCY_VUS','DURATION_MINS'].each { token ->
-                sh 'echo ${token}'
+                echo token
                 tok = token.replace('&','\\&')
-                sh 'echo ${tok}'
-                sh 'sed -i "s|\\[\\['+"${token}"+'\\]\\]|$'+"${token}"+'|g" project/default.yaml'
+                echo tok
+                sh 'sed -i "s|\\[\\['+"${token}"+'\\]\\]|$'+tok+'|g" project/default.yaml'
               }
             }
             sh 'cat project/default.yaml'
