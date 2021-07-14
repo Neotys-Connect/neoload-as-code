@@ -61,11 +61,11 @@ pipeline {
             sh 'rm -rf project/ && mkdir -p project/'
             sh 'cp training/module6/d/sanity.slas.nl.yaml project/sanity.slas.nl.yaml'
             sh 'cp training/module6/d/api.template.nl.yaml project/default.yaml'
-            sh 'echo $API_URL'
-            sh 'API_URL=$(printf '%s\n' "$API_URL" | sed -e \'s/[\/&]/\\&/g\')'
-            sh 'echo $API_URL'
             script {
               ['API_URL','RESPONSE_CONTAINS','CONCURRENCY_VUS','DURATION_MINS'].each { token ->
+                sh 'echo ${token}'
+                tok = token.replace('&','\\&')
+                sh 'echo ${tok}'
                 sh 'sed -i "s|\\[\\['+"${token}"+'\\]\\]|$'+"${token}"+'|g" project/default.yaml'
               }
             }
