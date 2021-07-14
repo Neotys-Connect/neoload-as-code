@@ -69,8 +69,8 @@ pipeline {
               }
               writeFile(file: 'project/default.yaml', text: yaml)
             }
-            sh 'neoload validate project/'
             sh 'cat project/default.yaml'
+            sh 'neoload validate project/'
           }
         }
         stage('Upload Test Assets') {
