@@ -39,6 +39,15 @@ pipeline {
 
 
       stages {
+        stage('Parse parameters') {
+          steps {
+            withFileParameter('cities_csv_file') {
+              sh 'echo $cities_csv_file'
+              sh 'ls -latr'
+              sh 'cp $cities_csv_file input_cities.csv'
+            }
+          }
+        }
         stage('Prepare agent') {
           steps {
             sh 'neoload --version'
@@ -55,11 +64,6 @@ pipeline {
         }
         stage('Prepare Test Assets') {
           steps {
-            withFileParameter('cities_csv_file') {
-              sh 'echo $cities_csv_file'
-              sh 'ls -latr'
-              sh 'cp $cities_csv_file input_cities.csv'
-            }
             writeFile(file: "d.variables.yaml", text:"""
 variables:
 - file:
