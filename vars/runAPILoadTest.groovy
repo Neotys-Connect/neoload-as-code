@@ -30,10 +30,19 @@ def call(Map params) {
 
             if(env.CONCURRENCY_VUS.toInteger() > 100)
               error "You cannot run more than 100 concurrency threads (VUs) with this type of pipeline."
+            if(env.CONCURRENCY_VUS.toInteger() < 2)
+              error "You cannot run less than 2 concurrency threads (VUs) with this type of pipeline."
 
             if(env.DURATION_MINS.toInteger() > 60)
               error "You cannot run longer than 60mins with this type of pipeline."
 
+
+            env.LG_COUNT = 1
+            vus_per_lg_max = 500
+            env.LG_COUNT = Math.ceil(env.CONCURRENCY_VUS.toInteger() / vus_per_lg_max)
+            
+            if(env.LG_COUNT > 3)
+              error "Your concurrency requires ${env.LG_COUNT} but we only allow at most 3"
           }
         }
       }
@@ -72,7 +81,7 @@ def call(Map params) {
           }
           stage('Prepare Neoload CLI') {
             steps {
-              sh "neoload test-settings --zone ${env.zone_id} --lgs 1 --scenario sanityScenario createorpatch 'example-Jenkins-module6d-${env.agent_name}'"
+              sh "neoload test-settings --zone ${env.zone_id} --lgs ${env.LG_COUNT} --scenario sanityScenario createorpatch 'example-Jenkins-module6d-${env.agent_name}'"
             }
           }
           stage('Prepare Test Assets') {
@@ -108,8 +117,8 @@ def call(Map params) {
           //     // max period of time to queue = 5m
           //     // loop while max waiting period hasn't elapsed
           //     //    check for 'appropriate' zone --> neoload zones | jq '...'
-          //     //    if found a zone, break --> continue
-          //     //    if didn't find a zone, wait for short time, then check again
+          //     //    if found enough [env.LG_COUNT] LGs in a particular zone, break --> continue
+          //     //    otherwise, wait for short time, then check again
           //   }
           // }
 
