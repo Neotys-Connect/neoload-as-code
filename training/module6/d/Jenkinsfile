@@ -65,8 +65,8 @@ pipeline {
               yaml = readFile('project/default.yaml')
               ['API_URL','RESPONSE_CONTAINS','CONCURRENCY_VUS','DURATION_MINS'].each { token ->
                 echo "[[${token}]]"
-                echo groovy.util.Eval.me("\$${token}")
-                yaml = yaml.replace("[[${token}]]",groovy.util.Eval.me("\$${token}"))
+                echo env["${token}"]
+                yaml = yaml.replace("[[${token}]]",env["${token}"])
               }
               writeFile(file: 'project/default.yaml', text: yaml)
             }
