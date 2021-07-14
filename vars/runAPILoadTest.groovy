@@ -19,21 +19,22 @@ def call(Map params) {
     stages {
 
       stage ('Validate parameters') {
+        steps {
+          script {
 
-        script {
+            if(isNullOrEmpty(env.API_URL))
+              error "You must specify a proper API URL."
 
-          if(isNullOrEmpty(env.API_URL))
-            error "You must specify a proper API URL."
+            if(isNullOrEmpty(env.RESPONSE_CONTAINS))
+              error "You must specify something that always describes successful response contents."
 
-          if(isNullOrEmpty(env.RESPONSE_CONTAINS))
-            error "You must specify something that always describes successful response contents."
+            if(env.CONCURRENCY_VUS.toInteger() > 100)
+              error "You cannot run more than 100 concurrency threads (VUs) with this type of pipeline."
 
-          if(env.CONCURRENCY_VUS.toInteger() > 100)
-            error "You cannot run more than 100 concurrency threads (VUs) with this type of pipeline."
+            if(env.DURATION_MINS.toInteger() > 60)
+              error "You cannot run longer than 60mins with this type of pipeline."
 
-          if(env.DURATION_MINS.toInteger() > 60)
-            error "You cannot run longer than 60mins with this type of pipeline."
-
+          }
         }
       }
 
