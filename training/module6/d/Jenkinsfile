@@ -45,7 +45,7 @@ pipeline {
         stage('Prepare agent') {
           steps {
             sh 'neoload --version'
-            sh 'printenv'
+            //sh 'printenv'
             withCredentials([string(credentialsId: 'NLW_TOKEN', variable: 'NLW_TOKEN')]) {
               sh "neoload login --url ${env.nlw_api_url} $NLW_TOKEN"
             }
