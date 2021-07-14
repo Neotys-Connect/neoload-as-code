@@ -60,10 +60,10 @@ pipeline {
           steps {
             sh 'rm -rf project/ && mkdir -p project/'
             sh 'cp training/module6/d/api.template.nl.yaml project/default.yaml'
-            sh 'sed -i "s|\[\[API_URL\]\]|$API_URL|g" project/default.yaml'
-            sh 'sed -i "s/\[\[RESPONSE_CONTAINS\]\]/$RESPONSE_CONTAINS/g" project/default.yaml'
-            sh 'sed -i "s/\[\[CONCURRENCY_VUS\]\]/$CONCURRENCY_VUS/g" project/default.yaml'
-            sh 'sed -i "s/\[\[DURATION_MINS\]\]/$DURATION_MINS/g" project/default.yaml'
+            sh 'sed -i "s|\\[\\[API_URL\\]\\]|$API_URL|g" project/default.yaml'
+            sh 'sed -i "s/[[RESPONSE_CONTAINS]]/$RESPONSE_CONTAINS/g" project/default.yaml'
+            sh 'sed -i "s/[[CONCURRENCY_VUS]]/$CONCURRENCY_VUS/g" project/default.yaml'
+            sh 'sed -i "s/[[DURATION_MINS]]/$DURATION_MINS/g" project/default.yaml'
             sh 'cat project/default.yaml'
           }
         }
