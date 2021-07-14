@@ -62,7 +62,7 @@ pipeline {
             sh 'cp training/module6/d/api.template.nl.yaml project/default.yaml'
             script {
               ['API_URL','RESPONSE_CONTAINS','CONCURRENCY_VUS','DURATION_MINS'].each { token ->
-                sh 'sed -i "s|\\[\\['+"${animalName}"+'\\]\\]|$'+"${animalName}"+'|g" project/default.yaml'
+                sh 'sed -i "s|\\[\\['+"${token}"+'\\]\\]|$'+"${token}"+'|g" project/default.yaml'
               }
             }
             sh 'cat project/default.yaml'
