@@ -28,7 +28,7 @@ def call(Map params) {
             if(isNullOrEmpty(env.RESPONSE_CONTAINS))
               error "You must specify something that always describes successful response contents."
 
-            if(env.CONCURRENCY_VUS.toInteger() > 100)
+            if(env.CONCURRENCY_VUS.toInteger() > 2000)
               error "You cannot run more than 100 concurrency threads (VUs) with this type of pipeline."
             if(env.CONCURRENCY_VUS.toInteger() < 2)
               error "You cannot run less than 2 concurrency threads (VUs) with this type of pipeline."
@@ -43,6 +43,7 @@ def call(Map params) {
             
             if(env.LG_COUNT > 3)
               error "Your concurrency requires ${env.LG_COUNT} but we only allow at most 3"
+              
           }
         }
       }
