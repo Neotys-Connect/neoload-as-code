@@ -81,6 +81,15 @@ pipeline {
           }
         }
 
+        // stage('Queue for available infra') {
+        //   steps {
+        //     // max period of time to queue = 5m
+        //     // loop while max waiting period hasn't elapsed
+        //     //    check for 'appropriate' zone --> neoload zones | jq '...'
+        //     //    if found a zone, break --> continue
+        //     //    if didn't find a zone, wait for short time, then check again
+        //   }
+        // }
 
 
         stage('Run a sanity scenario') {
