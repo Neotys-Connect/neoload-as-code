@@ -11,7 +11,7 @@ pipeline {
   }
 
   parameters {
-    base64File 'test_data'
+    base64File 'cities_csv_file'
   }
 
   stages {
@@ -55,8 +55,10 @@ pipeline {
         }
         stage('Prepare Test Assets') {
           steps {
-            withFileParameter('test_data') {
-              sh 'cp $test_data input_cities.csv'
+            withFileParameter('cities_csv_file') {
+              sh 'echo $cities_csv_file'
+              sh 'ls -latr'
+              sh 'cp $cities_csv_file input_cities.csv'
             }
             writeFile(file: "d.variables.yaml", text:"""
 variables:
