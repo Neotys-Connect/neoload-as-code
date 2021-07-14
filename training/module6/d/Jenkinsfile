@@ -60,7 +60,7 @@ pipeline {
           steps {
             sh 'rm -rf project/ && mkdir -p project/'
             sh 'cp training/module6/d/sanity.slas.nl.yaml project/sanity.slas.nl.yaml'
-            sh 'cp training/module6/d/api.template.nl.yaml project/default.yaml'
+            sh 'cp training/module6/d/templates/api.template.nl.yaml project/default.yaml'
             script {
               yaml = readFile('project/default.yaml')
               ['API_URL','RESPONSE_CONTAINS','CONCURRENCY_VUS','DURATION_MINS'].each { token ->
@@ -69,6 +69,7 @@ pipeline {
               }
               writeFile(file: 'project/default.yaml', text: yaml)
             }
+            sh 'neoload validate project/'
             sh 'cat project/default.yaml'
           }
         }
@@ -133,13 +134,6 @@ pipeline {
                       echo "Logs url: ${logs_url}"
 
                       sh "neoload fastfail --max-failure 25 slas cur"
-                    }
-                  }
-                }
-                stage('Custom test exit criteria') {
-                  steps {
-                    script {
-                      sleep(time:15,unit:"SECONDS")
                     }
                   }
                 }
