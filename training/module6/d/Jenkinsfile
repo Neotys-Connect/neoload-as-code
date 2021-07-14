@@ -65,8 +65,8 @@ pipeline {
               yaml = readFile('project/default.yaml')
               ['API_URL','RESPONSE_CONTAINS','CONCURRENCY_VUS','DURATION_MINS'].each { token ->
                 echo "[[${token}]]"
-                echo "\$${token}"
-                yaml = yaml.replace("[[${token}]]","\$${token}")
+                echo Eval.me("\$${token}")
+                yaml = yaml.replace("[[${token}]]",Eval.me("\$${token}"))
               }
               writeFile(file: 'project/default.yaml', text: yaml)
             }
