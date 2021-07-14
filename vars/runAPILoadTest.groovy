@@ -39,7 +39,7 @@ def call(Map params) {
 
             LG_COUNT = 1
             vus_per_lg_max = 500
-            LG_COUNT = Math.ceil(env.CONCURRENCY_VUS.toInteger() / vus_per_lg_max)
+            LG_COUNT = Math.ceil(env.CONCURRENCY_VUS.toInteger() / vus_per_lg_max).round()
             
             if(LG_COUNT > 4)
               error "Your concurrency requires ${LG_COUNT} but we only allow at most 3"
