@@ -12,7 +12,7 @@ user_paths:
     steps:
     - request:
         url: "[[API_URL]]"
-        sla_profile: sla_profiles
+        sla_profile: api_defaults
         assertions:
         - contains: "[[RESPONSE_CONTAINS]]"
     - delay: 1s
