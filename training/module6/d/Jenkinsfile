@@ -1,0 +1,91 @@
+pipeline {
+  agent none
+
+  environment {
+    docker_label="nljenkinsagent"
+    nlw_host="nlweb.shared"
+    api_url="http://${env.nlw_host}:8080"
+    zone_id="defaultzone"
+    full_test_max_vus = 5
+    full_test_duration_mins = 3
+  }
+
+  parameters {
+    string name: 'API_URL', description: 'The full URL of the API call to make'
+    string name: 'RESPONSE_CONTAINS', description: 'Some text that MUST be in the API response to consider it valid.'
+    choice name: 'CONCURRENCY_VUS', choices: ['20', '50', '100'], description: 'The number of concurrent threads/calls to run against this API.'
+    choice name: 'DURATION_MINS', choices: ['2', '5', '10', '30'], description: 'How long to run this test.'
+  }
+
+  stages {
+    stage ('Prep workspace') {
+      agent any
+      steps {
+        cleanWs()
+        script {
+          sh "uname -a"
+          env.host_ip = sh(script: "getent hosts ${env.nlw_host} | head -n1 | grep -oE '((1?[0-9][0-9]?|2[0-4][0-9]|25[0-5])\\.){3}(1?[0-9][0-9]?|2[0-4][0-9]|25[0-5])'", returnStdout: true)
+          env.agent_name = "${env.VM_HOST_EXT_IP}" // sh(script: "uname -a | tr -s ' ' | cut -d ' ' -f2", returnStdout: true)
+        }
+      }
+    }
+    stage('Attach Worker') {
+      agent {
+        docker {
+          image "${env.docker_label}:latest"
+          args "--add-host ${env.nlw_host}:${env.host_ip} -e HOME=${env.WORKSPACE} -e PYTHONUNBUFFERED=1"
+        }
+      }
+
+
+
+
+
+      stages {
+        stage('Prepare agent') {
+          steps {
+            sh 'neoload --version'
+            sh 'printenv'
+            withCredentials([string(credentialsId: 'NLW_TOKEN', variable: 'NLW_TOKEN')]) {
+              sh "neoload login --url ${env.api_url} $NLW_TOKEN"
+            }
+          }
+        }
+        stage('Prepare Neoload CLI') {
+          steps {
+            sh "neoload test-settings --zone ${env.zone_id} --lgs 1 --scenario sanityScenario createorpatch 'example-Jenkins-module6d-${env.agent_name}'"
+          }
+        }
+        stage('Prepare Test Assets') {
+          steps {
+            sh 'rm -rf project/ && mkdir -p project/'
+            sh 'cp training/module6/d/api.template.nl.yaml project/default.yaml'
+            sh 'sed -i "s|[[API_URL]]|$API_URL|g" project/default.yaml'
+            sh 'cat project/default.yaml'
+          }
+        }
+        stage('Upload Test Assets') {
+          steps {
+            sh "neoload project --path project/ upload"
+            sh "neoload status"
+          }
+        }
+
+
+
+        // stage('Run Test') {
+        //   steps {
+        //     sh "neoload run --name \"${env.JOB_NAME}-${env.BUILD_NUMBER}-${env.agent_name}\""
+        //   }
+        //   post {
+        //     always {
+        //       sh "neoload test-results junitsla"
+        //       sh "sed -i 's/\\<br\\/\\>/\\n/g' junit-sla.xml"
+        //       junit 'junit-sla.xml'
+        //     }
+        //   }
+        // }
+      }
+    }
+  }
+}

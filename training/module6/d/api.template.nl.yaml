@@ -1,0 +1,40 @@
+name: NeoLoad-as-code-module-6d
+
+sla_profiles:
+- name: api_defaults
+  thresholds:
+  - avg-resp-time warn >= 200ms fail >= 500ms per interval
+  - error-rate warn >= 2% fail >= 5% per test
+
+user_paths:
+- name: api_call
+  actions:
+    steps:
+    - request:
+        url: "[[API_URL]]"
+        sla_profile: sla_profiles
+        assertions:
+        - contains: "[[RESPONSE_CONTAINS]]"
+    - delay: 1s
+
+populations:
+- name: pop1
+  user_paths:
+  - name: api_call
+
+scenarios:
+- name: sanityScenario
+  populations:
+  - name: pop1
+    constant_load:
+      users: 2
+      duration: 30s
+- name: fullTest
+  populations:
+  - name: pop1
+    rampup_load:
+      min_users: 1
+      max_users: [[CONCURRENCY_VUS]]
+      increment_users: 1
+      increment_every: 2s
+      duration: [[DURATION_MINS]]m
