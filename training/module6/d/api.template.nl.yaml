@@ -10,12 +10,15 @@ user_paths:
 - name: api_call
   actions:
     steps:
-    - request:
-        url: "[[API_URL]]"
-        sla_profile: api_defaults
-        assertions:
-        - contains: "[[RESPONSE_CONTAINS]]"
-    - delay: 1s
+    - transaction:
+        name: "Single API Call"
+        steps:
+          - request:
+              url: "[[API_URL]]"
+              sla_profile: api_defaults
+              assertions:
+              - contains: "[[RESPONSE_CONTAINS]]"
+          - delay: 500ms
 
 populations:
 - name: pop1

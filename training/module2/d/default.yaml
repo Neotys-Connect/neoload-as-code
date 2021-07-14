@@ -54,7 +54,7 @@ user_paths:
 
         - request:
             server: idp
-            url: ${my_url}
+            url: /${idp_u_login}
             method: GET
         - think_time: 1s
 
