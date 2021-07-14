@@ -4,7 +4,7 @@ pipeline {
   environment {
     docker_label="nljenkinsagent"
     nlw_host="nlweb.shared"
-    api_url="http://${env.nlw_host}:8080"
+    nlw_api_url="http://${env.nlw_host}:8080"
     zone_id="defaultzone"
     full_test_max_vus = 5
     full_test_duration_mins = 3
@@ -47,7 +47,7 @@ pipeline {
             sh 'neoload --version'
             sh 'printenv'
             withCredentials([string(credentialsId: 'NLW_TOKEN', variable: 'NLW_TOKEN')]) {
-              sh "neoload login --url ${env.api_url} $NLW_TOKEN"
+              sh "neoload login --url ${env.nlw_api_url} $NLW_TOKEN"
             }
           }
         }
@@ -61,6 +61,9 @@ pipeline {
             sh 'rm -rf project/ && mkdir -p project/'
             sh 'cp training/module6/d/api.template.nl.yaml project/default.yaml'
             sh 'sed -i "s|[[API_URL]]|$API_URL|g" project/default.yaml'
+            sh 'sed -i "s/[[RESPONSE_CONTAINS]]/$RESPONSE_CONTAINS/g" project/default.yaml'
+            sh 'sed -i "s/[[CONCURRENCY_VUS]]/$CONCURRENCY_VUS/g" project/default.yaml'
+            sh 'sed -i "s/[[DURATION_MINS]]/$DURATION_MINS/g" project/default.yaml'
             sh 'cat project/default.yaml'
           }
         }
