@@ -4,7 +4,7 @@ sla_profiles:
 - name: api_defaults
   thresholds:
   - avg-resp-time warn >= 200ms fail >= 500ms per interval
-  - error-rate warn >= 2% fail >= 5% per test
+  - error-rate warn >= 2% fail >= 5% per interval
 
 user_paths:
 - name: api_call
