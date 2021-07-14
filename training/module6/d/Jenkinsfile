@@ -62,12 +62,11 @@ pipeline {
             sh 'cp training/module6/d/sanity.slas.nl.yaml project/sanity.slas.nl.yaml'
             sh 'cp training/module6/d/api.template.nl.yaml project/default.yaml'
             script {
+              yaml = readFile('project/default.yaml')
               ['API_URL','RESPONSE_CONTAINS','CONCURRENCY_VUS','DURATION_MINS'].each { token ->
-                echo token
-                tok = token.replace('&','\\&')
-                echo tok
-                sh 'sed -i "s|\\[\\['+"${token}"+'\\]\\]|$'+tok+'|g" project/default.yaml'
+                yaml = replace(token,"${token}")
               }
+              writeFile('project/default.yaml',yaml)
             }
             sh 'cat project/default.yaml'
           }
