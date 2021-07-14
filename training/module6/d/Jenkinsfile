@@ -80,9 +80,6 @@ pipeline {
 
         stage('Run a sanity scenario') {
           steps {
-            dir('tests/neoload_projects/example_1/') {
-              unstash 'dynamics'
-            }
             script {
               sanityCode = 3 // default to something absurd
               try {
